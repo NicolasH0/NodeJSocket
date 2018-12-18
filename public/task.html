@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Tasks</title>
+	<link rel="stylesheet" type="text/css" href="task.css">
+	<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="container">
+  <div id="tasks">
+    <div id="notification">Your task list</div>
+    <ul id="tasksList">
+    </ul>
+  </div>
+
+  <div id="footer">
+      <input id="taskInput" type="text" placeholder="Your task"/>
+      <input class="taskDescription" type="text" placeholder="Description"/>
+      <button id="taskAdd" onclick="task();">+</button>
+  </div>
+</div>
+</body>
+</html>
+<script>-
+	$(document).ready(function(){
+		getTask();
+		getUser();
+	});
+	$(function() {
+  var $tasksList = $("#tasksList");
+  var $taskInput = $("#taskInput");
+  var $taskDescription = $(".taskDescription");
+  var $notification = $("#notification");
+  var displayNotification = function() {
+    if(!$tasksList.children().length){
+      $notification.fadeIn("fast");
+    } else {
+      $notification.css("display", "none")
+    }
+  }
+  $("#taskAdd").on("click", function() {
+    if(!$taskInput.val()) { return false; }
+    if(!$taskDescription.val()) { return false; }
+    $tasksList.append("<li>" + $taskInput.val() + "<button class='delete'>&#10006</button>" + "<p class='description'>" + $taskDescription.val() + "</p>" + "</li>");
+    $taskInput.val("");
+    $taskDescription.val("");
+    displayNotification();
+    $(".delete").on("click", function() {
+      var $parent = $(this).parent();
+      $parent.css("animation", "fadeOut .3s linear");
+      setTimeout(function(){
+        $parent.remove();
+        displayNotification();
+      }, 295);
+
+    })
+  })
+});
+
+function task() {
+	var taskName = $("#taskInput").val();
+  	var taskDescription1 = $(".taskDescription").val();
+  	var myArray = {};
+  	myArray.name = taskName;
+  	myArray.desc = taskDescription1;
+  	console.log(myArray);
+  	var myJsonString = JSON.stringify(myArray);
+  	sendTask(myJsonString);
+}
+
+function sendTask(json){
+ 	$.ajax({
+        type: 'POST',
+        url: '',
+        data: json,
+        timeout: 500,
+        success: function(data){
+          alert("Data Sent");
+        },
+        error: function(){
+          alert("Failed to send data");
+        }
+    });
+}
+
+function getTask() {
+	var $tasksList = $("#tasksList");
+	$.get( "http://localhost/api/task", function( data ) {
+		console.log(data);
+	  	var tasks = JSON.parse(data);
+	  	console.log(tasks.tasks);
+	 	tasks.tasks.forEach(function(item){
+			$tasksList.append("<li>" + item.name + "<button class='delete'>&#10006</button>" + "<p class='description'>" + item.desc + "</p>" + "</li>");
+	 	});
+	});
+}
+function getUser() {
+	$.get( "http://192.168.137.41:8080/users", function( data ) {
+		$('#footer').append(
+			'<select id="monselect">' +
+			data.forEach(function(user){
+					'<option value="'+ user.idUser +'">'+ user.name + ' ' +  user.firstname +'</option> '
+			}) +
+			'</select>'
+		);
+		console.log(user);
+	});
+}
+</script>
