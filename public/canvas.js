@@ -12,7 +12,7 @@
   var SelectedFontSize;
   
   
-// Keep everything in anonymous function, called on window load.
+// Keep everything in anonymous fun ction, called on window load.
 if(window.addEventListener) {
 window.addEventListener('load', function () {
   var canvas, context, canvaso, contexto;
